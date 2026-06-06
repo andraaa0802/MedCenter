@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="ro" xmlns="http://www.w3.org/1999/html">
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>Contul Meu - MedCenter</title>
+
+    <link href="assets/img/favicon.png" rel="icon">
+    <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="https://fonts.googleapis.com" rel="preconnect">
+    <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900&display=swap" rel="stylesheet">
+
+    <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+    <link href="assets/vendor/aos/aos.css" rel="stylesheet">
+    <link href="assets/vendor/fontawesome-free/css/all.min.css" rel="stylesheet">
+    <link href="assets/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
+    <link href="assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
+    <link href="assets/css/main.css" rel="stylesheet">
+
+    <style>
+        .auth-section {
+            padding-top: 80px;
+            padding-bottom: 60px;
+            min-height: 80vh;
+            background-color: #f8f9fa;
+        }
+        .auth-card {
+            border: none;
+            border-radius: 1rem;
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.08);
+            background: white;
+            overflow: hidden;
+        }
+        .nav-pills .nav-link {
+            border-radius: 0.5rem;
+            color: #495057;
+            font-weight: 500;
+        }
+        .nav-pills .nav-link.active {
+            background-color: #0d6efd;
+            color: white;
+        }
+        .password-toggle-icon {
+            cursor: pointer;
+            z-index: 10;
+            padding: 10px;
+        }
+        .password-toggle-icon:hover {
+            color: #0d6efd !important;
+        }
+        #preloader { display: none !important; }
+
+        .text-success { color: #198754 !important; transition: color 0.3s ease; }
+        .text-danger { color: #dc3545 !important; transition: color 0.3s ease; }
+
+        /* Prevenire pâlpâire buton programare pentru Admin/Doctor */
+        html.is-staff #header-appointment-btn {
+            display: none !important;
+        }
+    </style>
+</head>
+
+<body class="index-page">
+<script>
+    // Blochează butonul "Fă o programare" pentru Admin și Doctor vizual înainte să se încarce restul
+    const role = localStorage.getItem('userRole');
+    if (role === 'ADMIN' || role === 'DOCTOR') {
+        document.documentElement.classList.add('is-staff');
+    }
+</script>
+
+<header id="header" class="header sticky-top" data-include="header.html"></header>
+
+<main class="main">
+    <section id="account-section" class="auth-section">
+        <div class="container">
+
+            <div id="auth-container" class="mx-auto auth-card" style="max-width: 450px;">
+                <div class="p-4 p-md-5">
+                    <div class="text-center mb-4">
+                        <i class="bi bi-heart-pulse text-primary" style="font-size: 3rem;"></i>
+                        <h3 class="mt-2 fw-bold">MedCenter</h3>
+                        <p class="text-muted small">Portalul tău medical digital</p>
+                    </div>
+
+                    <ul class="nav nav-pills nav-justified mb-4" id="auth-tabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="login-tab" data-bs-toggle="pill" data-bs-target="#login-box" type="button" role="tab">Autentificare</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="signup-tab" data-bs-toggle="pill" data-bs-target="#signup-box" type="button" role="tab">Înregistrare</button>
+                        </li>
+                    </ul>
+
+                    <div class="tab-content" id="auth-tabs-content">
+                        <div class="tab-pane fade show active" id="login-box" role="tabpanel">
+                            <form id="login-form">
+                                <div class="form-floating mb-3">
+                                    <input type="email" class="form-control" id="login-email" placeholder="nume@exemplu.ro" required>
+                                    <label for="login-email">Adresă Email</label>
+                                </div>
+                                <div class="form-floating mb-4 position-relative">
+                                    <input type="password" class="form-control pe-5" id="login-pass" placeholder="Parolă" required>
+                                    <label for="login-pass">Parolă</label>
+                                    <i class="bi bi-eye-slash text-muted position-absolute top-50 end-0 translate-middle-y me-2 password-toggle-icon" onclick="togglePasswordVisibility('login-pass', this)"></i>
+                                </div>
+                                <button type="submit" class="btn btn-primary w-100 py-3 fw-bold rounded-3">
+                                    <i class="bi bi-box-arrow-in-right me-2"></i> Intră în cont
+                                </button>
+                            </form>
+                        </div>
+
+                        <div class="tab-pane fade" id="signup-box" role="tabpanel">
+                            <form id="signup-form">
+                                <div class="form-floating mb-3">
+                                    <input type="text" class="form-control" id="signup-name" placeholder="Nume Complet" required>
+                                    <label for="signup-name">Nume Complet</label>
+                                </div>
+                                <div class="form-floating mb-3">
+                                    <input type="email" class="form-control" id="signup-email" placeholder="Email" required>
+                                    <label for="signup-email">Adresă Email</label>
+                                </div>
+                                <div class="form-floating mb-3">
+                                    <input type="tel" class="form-control" id="signup-phone" placeholder="Telefon" required>
+                                    <label for="signup-phone">Telefon (10 cifre)</label>
+                                </div>
+                                <div class="form-floating mb-2 position-relative">
+                                    <input type="password" class="form-control pe-5" id="signup-pass" placeholder="Parolă" required>
+                                    <label for="signup-pass">Parolă</label>
+                                    <i class="bi bi-eye-slash text-muted position-absolute top-50 end-0 translate-middle-y me-2 password-toggle-icon" onclick="togglePasswordVisibility('signup-pass', this)"></i>
+                                </div>
+
+                                <div id="password-requirements" class="mb-3 p-2 bg-light border rounded small d-none" style="font-size: 0.85rem;">
+                                    <p class="mb-1 text-muted"><strong>Cerințe parolă:</strong></p>
+                                    <div id="req-length" class="text-danger mb-1"><i class="bi bi-x-circle-fill"></i> Minim 8 caractere</div>
+                                    <div id="req-uppercase" class="text-danger mb-1"><i class="bi bi-x-circle-fill"></i> Cel puțin o literă mare</div>
+                                    <div id="req-lowercase" class="text-danger mb-1"><i class="bi bi-x-circle-fill"></i> Cel puțin o literă mică</div>
+                                    <div id="req-number" class="text-danger mb-1"><i class="bi bi-x-circle-fill"></i> Cel puțin o cifră</div>
+                                    <div id="req-special" class="text-danger mb-0"><i class="bi bi-x-circle-fill"></i> Un caracter special (@#$%^&+=!*?)</div>
+                                </div>
+
+                                <div class="form-floating mb-4 position-relative">
+                                    <input type="password" class="form-control pe-5" id="signup-pass-confirm" placeholder="Confirmă Parola" required>
+                                    <label for="signup-pass-confirm">Confirmă Parola</label>
+                                    <i class="bi bi-eye-slash text-muted position-absolute top-50 end-0 translate-middle-y me-2 password-toggle-icon" onclick="togglePasswordVisibility('signup-pass-confirm', this)"></i>
+                                    <div id="password-match-msg" class="mt-1 small fw-bold" style="display: none;"></div>
+                                </div>
+
+                                <button type="submit" class="btn btn-success w-100 py-3 fw-bold rounded-3">
+                                    <i class="bi bi-person-plus-fill me-2"></i> Creează Cont
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="profile-header" class="mx-auto auth-card d-none mb-4 p-3 shadow-sm" style="max-width: 1100px; border-left: 5px solid #0d6efd;">
+                <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="rounded-circle bg-primary bg-opacity-10 text-primary d-flex justify-content-center align-items-center" style="width: 50px; height: 50px; font-size: 1.5rem;">
+                            <i class="bi bi-person-fill" id="profile-icon"></i>
+                        </div>
+                        <div>
+                            <h5 class="fw-bold mb-0">Salut, <span id="profile-user-name">Utilizator</span>!</h5>
+                            <small class="text-muted fw-semibold text-uppercase" style="letter-spacing: 0.5px;" id="profile-role-text">Panoul tău de control</small>
+                        </div>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <a href="booking.html" id="new-booking-btn" class="btn btn-primary btn-sm fw-bold px-3 py-2"><i class="bi bi-calendar-plus me-1"></i> Programare Nouă</a>
+                        <button id="logout-btn" class="btn btn-outline-danger btn-sm fw-bold px-3 py-2"><i class="bi bi-box-arrow-right me-1"></i> Deconectare</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="patient-container" class="d-none w-100 mb-5">
+
+                <div class="auth-card mx-auto mt-4 p-4" style="max-width: 1100px;">
+                    <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3">
+                        <h4 class="text-secondary fw-bold m-0"><i class="bi bi-clock-history me-2"></i> Istoric Programări</h4>
+                    </div>
+                    <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-dark sticky-top">
+                            <tr>
+                                <th>Dată și Oră</th>
+                                <th>Medic</th>
+                                <th>Specializare</th>
+                                <th>Status</th>
+                                <th>Recenzie</th>
+                            </tr>
+                            </thead>
+                            <tbody id="user-bookings-table">
+                            <tr><td colspan="5" class="text-center text-muted py-4">Se încarcă programările...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="auth-card mx-auto mt-4 p-4" style="max-width: 1100px;">
+                    <div class="border-bottom pb-3 mb-4">
+                        <h4 class="text-info fw-bold m-0"><i class="bi bi-file-earmark-medical me-2"></i> Dosarul Meu Medical</h4>
+                        <p class="text-muted small mb-0 mt-1">Aceste informații sunt confidențiale și ajută medicii noștri să îți ofere cele mai bune recomandări în timpul consultației.</p>
+                    </div>
+
+                    <form id="medical-profile-form">
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold text-secondary">Grupa Sanguină</label>
+                                <select class="form-select" id="profile-blood-type">
+                                    <option value="">Necunoscută</option>
+                                    <option value="A+">A+</option>
+                                    <option value="A-">A-</option>
+                                    <option value="B+">B+</option>
+                                    <option value="B-">B-</option>
+                                    <option value="AB+">AB+</option>
+                                    <option value="AB-">AB-</option>
+                                    <option value="0+">0+</option>
+                                    <option value="0-">0-</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold text-secondary">Greutate (kg)</label>
+                                <input type="number" step="0.1" class="form-control" id="profile-weight" placeholder="ex: 75.5">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold text-secondary">Înălțime (cm)</label>
+                                <input type="number" class="form-control" id="profile-height" placeholder="ex: 175">
+                            </div>
+                        </div>
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold text-secondary">Alergii cunoscute</label>
+                                <textarea class="form-control" id="profile-allergies" rows="3" placeholder="Medicamente, alimente, etc. (Lasă gol dacă nu există)"></textarea>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold text-secondary">Afecțiuni cronice</label>
+                                <textarea class="form-control" id="profile-chronic" rows="3" placeholder="Ex: Diabet, Hipertensiune (Lasă gol dacă nu există)"></textarea>
+                            </div>
+                        </div>
+                        <div class="text-end">
+                            <button type="submit" class="btn btn-info text-white fw-bold px-4 py-2 shadow-sm">
+                                <i class="bi bi-save2 me-1"></i> Salvează Dosarul
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div id="doctor-container" class="d-none w-100 mb-5">
+
+                <div class="auth-card mx-auto mt-4 p-4" style="max-width: 1100px;">
+                    <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3">
+                        <h4 class="text-info fw-bold m-0"><i class="bi bi-calendar-heart me-2"></i> Agenda Mea</h4>
+                    </div>
+                    <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+                        <table class="table table-hover align-middle">
+                            <thead class="table-dark sticky-top">
+                            <tr>
+                                <th>Dată / Oră Start</th>
+                                <th>Durată</th>
+                                <th>Pacient</th>
+                                <th>Status</th>
+                                <th>Acțiune</th>
+                            </tr>
+                            </thead>
+                            <tbody id="doctor-agenda-table">
+                            <tr><td colspan="5" class="text-center text-muted py-4">Se încarcă agenda...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="auth-card mx-auto mt-4 p-4" style="max-width: 1100px;">
+                    <div class="border-bottom pb-3 mb-4">
+                        <h4 class="text-secondary fw-bold m-0"><i class="bi bi-sliders me-2"></i> Configurare Program de Lucru Săptămânal</h4>
+                        <p class="text-muted small mb-0">Bifează zilele în care ești activ la clinică și setează intervalul orar dorit.</p>
+                    </div>
+
+                    <form id="weekly-schedule-form">
+                        <div class="table-responsive">
+                            <table class="table table-bordered align-middle text-center">
+                                <thead class="table-light">
+                                <tr>
+                                    <th>Ziua</th>
+                                    <th>Status</th>
+                                    <th>Ora Început</th>
+                                    <th>Ora Sfârșit</th>
+                                    <th>Durată Consultație</th>
+                                </tr>
+                                </thead>
+                                <tbody id="schedule-matrix-body">
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="text-end mt-3">
+                            <button type="submit" class="btn btn-success fw-bold px-4 py-2 shadow-sm">
+                                <i class="bi bi-save2"></i> Salvează Modificările Programului
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="auth-card mx-auto mt-4 p-4" style="max-width: 1100px;">
+                    <div class="border-bottom pb-3 mb-4">
+                        <h4 class="text-warning fw-bold m-0" style="color: #fd7e14 !important;"><i class="bi bi-airplane-fill me-2"></i> Adaugă Concediu / Excepții</h4>
+                        <p class="text-muted small mb-0">Alege o perioadă pentru a închide complet programările. Zilele selectate vor deveni indisponibile pentru pacienți.</p>
+                    </div>
+
+                    <form id="vacation-form">
+                        <div class="row g-3 align-items-end">
+                            <div class="col-md-5">
+                                <label class="form-label fw-bold">Data de Început</label>
+                                <input type="date" class="form-control" id="vacation-start" required>
+                            </div>
+                            <div class="col-md-5">
+                                <label class="form-label fw-bold">Data de Sfârșit</label>
+                                <input type="date" class="form-control" id="vacation-end" required>
+                            </div>
+                            <div class="col-md-2 text-end">
+                                <button type="submit" class="btn btn-warning w-100 fw-bold text-dark shadow-sm">
+                                    <i class="bi bi-calendar-x"></i> Blochează
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div id="admin-container" class="d-none w-100 mb-5">
+                <div class="auth-card mx-auto mt-4 p-4" style="max-width: 1100px;">
+                    <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3">
+                        <h4 class="text-success fw-bold m-0"><i class="bi bi-graph-up-arrow me-2"></i> Performanță Clinică</h4>
+                    </div>
+
+                    <div class="row g-4 mb-4">
+                        <div class="col-md-4">
+                            <div class="card bg-primary bg-gradient text-white text-center p-4 shadow-sm border-0 rounded-4">
+                                <h2 id="stat-total-bookings" class="fw-bold mb-1 display-5">0</h2>
+                                <span class="text-white-50 fw-semibold text-uppercase" style="letter-spacing: 1px; font-size: 0.85rem;">Total Programări</span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card bg-success bg-gradient text-white text-center p-4 shadow-sm border-0 rounded-4">
+                                <h2 id="stat-revenue" class="fw-bold mb-1 display-5">0</h2>
+                                <span class="text-white-50 fw-semibold text-uppercase" style="letter-spacing: 1px; font-size: 0.85rem;">Venituri (RON)</span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card bg-info bg-gradient text-white text-center p-4 shadow-sm border-0 rounded-4">
+                                <h2 id="stat-completed" class="fw-bold mb-1 display-5">0</h2>
+                                <span class="text-white-50 fw-semibold text-uppercase" style="letter-spacing: 1px; font-size: 0.85rem;">Consultații Finalizate</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <div class="card shadow-sm border-0 p-3 h-100 rounded-4 bg-light">
+                                <h6 class="text-secondary fw-bold text-center mb-3">Distribuția pe Specializări</h6>
+                                <canvas id="specialtyChart" style="max-height: 250px;"></canvas>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card shadow-sm border-0 p-3 h-100 rounded-4 bg-light">
+                                <h6 class="text-secondary fw-bold text-center mb-3">Status Programări</h6>
+                                <canvas id="statusChart" style="max-height: 250px;"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="auth-card mx-auto mt-4 p-4" style="max-width: 1100px;">
+                    <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3">
+                        <h4 class="text-danger fw-bold m-0"><i class="bi bi-calendar-check-fill me-2"></i> Management Programări</h4>
+                    </div>
+                    <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+                        <table class="table table-hover align-middle">
+                            <thead class="table-dark sticky-top">
+                            <tr>
+                                <th>Dată / Oră</th>
+                                <th>Pacient</th>
+                                <th>Medic / Specializare</th>
+                                <th>Status</th>
+                                <th>Acțiune</th>
+                            </tr>
+                            </thead>
+                            <tbody id="admin-bookings-table">
+                            <tr><td colspan="5" class="text-center text-muted py-4">Se încarcă programările...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="auth-card mx-auto mt-4 p-4" style="max-width: 1100px;">
+                    <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3">
+                        <h4 class="text-secondary fw-bold m-0"><i class="bi bi-envelope-fill me-2"></i> Mesaje Pacienți</h4>
+                    </div>
+                    <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+                        <table class="table table-hover align-middle">
+                            <thead class="table-dark sticky-top">
+                            <tr>
+                                <th>Dată / Oră</th>
+                                <th>Nume</th>
+                                <th>Email</th>
+                                <th>Subiect</th>
+                                <th>Mesaj</th>
+                                <th>Status</th>
+                                <th>Acțiune</th>
+                            </tr>
+                            </thead>
+                            <tbody id="admin-messages-table">
+                            <tr><td colspan="7" class="text-center text-muted py-4">Se încarcă mesajele...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <div class="modal fade" id="medicalProfileModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header bg-info bg-gradient text-white">
+                    <h5 class="modal-title fw-bold" id="medicalProfileModalLabel"><i class="bi bi-file-earmark-medical me-2"></i>Dosar Medical</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-0" id="medicalProfileModalBody">
+                    <div class="text-center py-5"><span class="spinner-border text-info"></span></div>
+                </div>
+                <div class="modal-footer bg-light">
+                    <button type="button" class="btn btn-secondary fw-bold" data-bs-dismiss="modal">Închide</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<div data-include="footer.html"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="assets/vendor/aos/aos.js"></script>
+<script src="assets/vendor/glightbox/js/glightbox.min.js"></script>
+<script src="assets/vendor/purecounter/purecounter_vanilla.js"></script>
+<script src="assets/vendor/swiper/swiper-bundle.min.js"></script>
+<script src="assets/js/loader.js"></script>
+
+<script src="assets/js/auth.js"></script>
+<script src="assets/js/patient.js"></script>
+<script src="assets/js/doctor.js"></script>
+<script src="assets/js/admin.js"></script>
+<script src="assets/js/chatbot.js"></script>
+
+</body>
+</html>

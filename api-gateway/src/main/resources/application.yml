@@ -1,0 +1,23 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    gateway:
+      routes:
+        - id: auth-service
+          uri: http://127.0.0.1:8081  # Schimbat din localhost în IP direct
+          predicates:
+            - Path=/auth/**
+
+        - id: resource-service
+          uri: http://127.0.0.1:8082
+          predicates:
+            - Path=/resources/**
+
+        - id: booking-service
+          uri: http://127.0.0.1:8083
+          predicates:
+            - Path=/bookings/**

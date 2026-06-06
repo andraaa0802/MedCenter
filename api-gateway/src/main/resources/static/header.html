@@ -1,0 +1,66 @@
+<div class="topbar d-flex align-items-center">
+    <div class="container d-flex justify-content-center justify-content-md-between">
+        <div class="contact-info d-flex align-items-center">
+            <i class="bi bi-envelope d-flex align-items-center"><a href="mailto:contact@medcenter.ro">contact@medcenter.com</a></i>
+            <i class="bi bi-phone d-flex align-items-center ms-4"><span>+40 722 000 000</span></i>
+        </div>
+        <div class="social-links d-none d-md-flex align-items-center">
+            <a href="#" class="twitter"><i class="bi bi-twitter-x"></i></a>
+            <a href="#" class="facebook"><i class="bi bi-facebook"></i></a>
+            <a href="#" class="instagram"><i class="bi bi-instagram"></i></a>
+            <a href="#" class="linkedin"><i class="bi bi-linkedin"></i></a>
+        </div>
+    </div>
+</div>
+
+<div class="branding d-flex align-items-center">
+    <div class="container position-relative d-flex align-items-center justify-content-between">
+        <a href="index.html" class="logo d-flex align-items-center me-auto">
+            <h1 class="sitename">MedCenter</h1>
+        </a>
+
+        <nav id="navmenu" class="navmenu">
+            <ul>
+                <li><a href="index.html#hero">Acasă</a></li>
+                <li><a href="index.html#about">Despre noi</a></li>
+                <li><a href="services.html">Servicii</a></li>
+                <li><a href="index.html#contact">Contact</a></li>
+                <li id="nav-login-item">
+                    <a class="nav-link" href="account.html">Contul meu</a>
+                </li>
+
+                <li id="nav-user-item" class="dropdown" style="display: none !important;">
+                    <a class="nav-link dropdown-toggle fw-bold text-primary" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="bi bi-person-circle"></i> <span id="display-user-name">Utilizator</span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0" aria-labelledby="navbarDropdown">
+                        <li>
+                            <a class="dropdown-item fw-bold text-dark" href="account.html">
+                                <i class="bi bi-person-vcard text-secondary me-2"></i> Panou Control
+                            </a>
+                        </li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <a class="dropdown-item text-danger fw-bold" href="#" id="btn-logout">
+                                <i class="bi bi-box-arrow-right me-2"></i> Deconectare
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+            <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
+        </nav>
+
+        <a id="header-appointment-btn" class="cta-btn d-none d-sm-block" style="display: none !important;" href="booking.html">Fă o programare</a>
+    </div>
+</div>
+
+<script>
+    const userRole = localStorage.getItem('userRole');
+    if (userRole === 'ADMIN' || userRole === 'DOCTOR') {
+        const appointmentBtn = document.getElementById('header-appointment-btn');
+        if (appointmentBtn) {
+            appointmentBtn.remove(); // Șterge elementul din HTML complet
+        }
+    }
+</script>
