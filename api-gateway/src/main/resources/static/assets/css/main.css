@@ -1752,3 +1752,196 @@ html.is-doctor #header-appointment-btn,
     transform: translateX(5px);
     border-color: #0d6efd !important;
 }
+
+/* =========================================
+   STILURI PENTRU PAGINA DE PROGRAMĂRI (BOOKING)
+   ========================================= */
+.booking-section {
+    padding-top: 140px;
+    min-height: 80vh;
+    background-color: #f8f9fa;
+}
+
+.booking-card {
+    border: none;
+    border-radius: 1rem;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.08);
+    background: white;
+    padding: 2.5rem;
+}
+
+/* Stiluri pentru butoanele de Sloturi (Zile si Ore) */
+.slot-btn {
+    border: 2px solid #dee2e6;
+    background: white;
+    color: #495057;
+    border-radius: 12px;
+    padding: 12px 15px;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    text-align: center;
+    min-width: 90px;
+    font-weight: 500;
+}
+
+.slot-btn:hover {
+    border-color: #0d6efd;
+    color: #0d6efd;
+    background-color: #f0f7ff;
+    transform: translateY(-2px);
+}
+
+.slot-btn.active {
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+    color: white;
+    box-shadow: 0 4px 8px rgba(13, 110, 253, 0.3);
+}
+
+.slot-btn.active span {
+    color: #ffffff !important;
+}
+
+.slot-btn.disabled-slot {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background-color: #f8f9fa;
+    pointer-events: none;
+}
+
+
+
+.auth-section {
+            padding-top: 80px;
+            padding-bottom: 60px;
+            min-height: 80vh;
+            background-color: #f8f9fa;
+        }
+        .auth-card {
+            border: none;
+            border-radius: 1rem;
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.08);
+            background: white;
+            overflow: hidden;
+        }
+        .nav-pills .nav-link {
+            border-radius: 0.5rem;
+            color: #495057;
+            font-weight: 500;
+        }
+        .nav-pills .nav-link.active {
+            background-color: #0d6efd;
+            color: white;
+        }
+        .password-toggle-icon {
+            cursor: pointer;
+            z-index: 10;
+            padding: 10px;
+        }
+        .password-toggle-icon:hover {
+            color: #0d6efd !important;
+        }
+        #preloader { display: none !important; }
+
+        .text-success { color: #198754 !important; transition: color 0.3s ease; }
+        .text-danger { color: #dc3545 !important; transition: color 0.3s ease; }
+
+        /* Prevenire pâlpâire buton programare pentru Admin/Doctor */
+        html.is-staff #header-appointment-btn {
+            display: none !important;
+        }
+
+        .chatbot-container {
+                    position: fixed;
+                    bottom: 30px;
+                    right: 30px;
+                    z-index: 99999;
+                }
+                .chatbot-window {
+                    width: 340px;
+                    border: 1px solid #dee2e6;
+                    background-color: white;
+                    animation: slideUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Efect de "săritură" la deschidere */
+                    display: flex;
+                    flex-direction: column;
+                }
+                .chat-msg {
+                    max-width: 85%;
+                    font-size: 0.9rem;
+                    margin-bottom: 12px;
+                    animation: fadeIn 0.3s ease-in;
+                    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+                }
+                .msg-bot {
+                    background-color: #ffffff;
+                    color: #333;
+                    border: 1px solid #e9ecef;
+                    border-radius: 15px 15px 15px 0;
+                    padding: 10px 15px;
+                    align-self: flex-start;
+                }
+                .msg-user {
+                    background-color: #0d6efd;
+                    color: white;
+                    border-radius: 15px 15px 0 15px;
+                    padding: 10px 15px;
+                    align-self: flex-end;
+                    margin-left: auto;
+                }
+                .chat-option-btn {
+                    display: block;
+                    width: 100%;
+                    text-align: left;
+                    margin-top: 6px;
+                    font-size: 0.85rem;
+                    border-radius: 15px;
+                    white-space: normal;
+                    transition: all 0.2s;
+                }
+                .chat-option-btn:hover {
+                    background-color: #0d6efd;
+                    color: white;
+                }
+                @keyframes slideUp {
+                    from { opacity: 0; transform: translateY(50px) scale(0.9); }
+                    to { opacity: 1; transform: translateY(0) scale(1); }
+                }
+                @keyframes fadeIn {
+                    from { opacity: 0; transform: translateY(10px); }
+                    to { opacity: 1; transform: translateY(0); }
+                }
+                #chatbot-btn:hover {
+                    transform: scale(1.1);
+                }
+                /* Stil pentru scrollbar sa arate finut */
+                #chatbot-messages::-webkit-scrollbar { width: 6px; }
+                #chatbot-messages::-webkit-scrollbar-thumb { background: #ccc; border-radius: 10px; }
+.team-member, [data-aos] {
+            opacity: 1 !important;
+            transform: none !important;
+            visibility: visible !important;
+        }
+
+        /* Stilizare pentru tab-urile din modalul de gestionare */
+        .nav-tabs .nav-link { font-weight: 500; color: #495057; }
+        .nav-tabs .nav-link.active { color: #0d6efd; font-weight: bold; border-bottom: 3px solid #0d6efd; }
+/* =========================================
+   FIX PENTRU ÎNCĂRCAREA ASINCRONĂ A PAGINILOR
+   ========================================= */
+
+/* 1. Rezervăm spațiul fizic al antetului (aprox 116px) doar cât timp se încarcă */
+#header[data-include] {
+    min-height: 116px;
+    background-color: #ffffff; /* Previne ecranul complet gol */
+}
+
+/* 2. Ascundem corpul paginilor secundare pentru o tranziție fină */
+body:not(.index-page) .main {
+    opacity: 0;
+    transition: opacity 0.4s ease-in-out;
+}
+
+/* 3. Clasa care se activează când header-ul a fost așezat perfect */
+body:not(.index-page) .main.content-ready {
+    opacity: 1;
+}

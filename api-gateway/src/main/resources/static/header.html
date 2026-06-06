@@ -51,16 +51,6 @@
             <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
         </nav>
 
-        <a id="header-appointment-btn" class="cta-btn d-none d-sm-block" style="display: none !important;" href="booking.html">Fă o programare</a>
+        <a id="header-appointment-btn" class="cta-btn d-none d-sm-block" href="booking.html">Fă o programare</a>
     </div>
 </div>
-
-<script>
-    const userRole = localStorage.getItem('userRole');
-    if (userRole === 'ADMIN' || userRole === 'DOCTOR') {
-        const appointmentBtn = document.getElementById('header-appointment-btn');
-        if (appointmentBtn) {
-            appointmentBtn.remove(); // Șterge elementul din HTML complet
-        }
-    }
-</script>
