@@ -22,7 +22,6 @@
 
 <body class="index-page">
 <script>
-    // Blochează butonul "Fă o programare" pentru Admin și Doctor vizual înainte să se încarce restul
     const role = localStorage.getItem('userRole');
     if (role === 'ADMIN' || role === 'DOCTOR') {
         document.documentElement.classList.add('is-staff');
@@ -392,6 +391,19 @@
                 </div>
                 <div class="modal-footer bg-light">
                     <button type="button" class="btn btn-secondary fw-bold" data-bs-dismiss="modal">Închide</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="messageModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Mesaj complet</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="modalMessageBody">
                 </div>
             </div>
         </div>

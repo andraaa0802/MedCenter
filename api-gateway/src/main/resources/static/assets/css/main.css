@@ -1945,3 +1945,9 @@ body:not(.index-page) .main {
 body:not(.index-page) .main.content-ready {
     opacity: 1;
 }
+
+.filter-btn { border-radius: 20px; margin: 5px; }
+.filter-btn.active-filter { background-color: var(--accent-color); color: white; }
+.team-member { border: 1px solid #f0f0f0; transition: 0.3s; }
+.team-member:hover { box-shadow: 0 5px 15px rgba(0,0,0,0.1) !important; }
+.opacity-50 { filter: grayscale(100%); }

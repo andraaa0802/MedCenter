@@ -23,7 +23,6 @@ public class BookingStatusScheduler {
     public void updatePastBookingsToCompleted() {
         LocalDateTime now = LocalDateTime.now();
 
-        // Căutăm toate programările care au rămas "CONFIRMED" deși ora lor de sfârșit (endTime) a trecut
         List<Booking> pastBookings = bookingRepository.findByStatusAndEndTimeBefore("CONFIRMED", now);
 
         if (!pastBookings.isEmpty()) {
@@ -32,7 +31,6 @@ public class BookingStatusScheduler {
             }
             bookingRepository.saveAll(pastBookings);
 
-            // Lăsăm un mesaj în consolă ca să știm că robotul și-a făcut treaba
             System.out.println("🤖 Cron Job Executat: Am marcat " + pastBookings.size() + " programări vechi ca fiind COMPLETED.");
         }
     }

@@ -33,7 +33,6 @@ public class User {
     @Column(name = "doctor_id", nullable = true)
     private Long doctorId;
 
-    // NOU: Câmpul pentru suspendarea conturilor (implicit true la creare)
     @Column(name = "is_active", columnDefinition = "boolean default true")
     private Boolean isActive = true;
 }

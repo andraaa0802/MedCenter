@@ -19,7 +19,6 @@ const qaDatabase = {
 
 let chatInitialized = false;
 
-// Funcție atașată global (window) ca să fie găsită mereu de butonul din HTML
 window.toggleChat = function() {
     const windowEl = document.getElementById('chatbot-window');
     const iconEl = document.querySelector('#chatbot-btn i');
@@ -27,7 +26,7 @@ window.toggleChat = function() {
     if (windowEl.classList.contains('d-none')) {
         windowEl.classList.remove('d-none');
         iconEl.classList.remove('bi-chat-dots-fill');
-        iconEl.classList.add('bi-x-lg'); // Iconita de închidere
+        iconEl.classList.add('bi-x-lg');
 
         if (!chatInitialized) {
             initChat();
@@ -35,7 +34,7 @@ window.toggleChat = function() {
     } else {
         windowEl.classList.add('d-none');
         iconEl.classList.remove('bi-x-lg');
-        iconEl.classList.add('bi-chat-dots-fill'); // Iconita de chat
+        iconEl.classList.add('bi-chat-dots-fill');
     }
 };
 
@@ -72,10 +71,9 @@ function showOptions() {
     scrollToBottom();
 }
 
-// Funcție atașată global
 window.handleOptionClick = function(key, buttonElement) {
     const parentContainer = buttonElement.closest('.options-container');
-    parentContainer.style.display = 'none'; // Ascunde butoanele
+    parentContainer.style.display = 'none';
 
     const data = qaDatabase[key];
     addUserMessage(data.question);

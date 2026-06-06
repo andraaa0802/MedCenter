@@ -9,9 +9,6 @@ const bookingForm = document.getElementById('booking-form');
 const daysContainer = document.getElementById('days-container');
 const hoursContainer = document.getElementById('hours-container');
 
-// ==============================================================
-// GENERATOR VIZUAL ZILE (Simetric: Exact 14 zile valide)
-// ==============================================================
 async function loadAvailableDays() {
     const doctorId = doctorSelect.value;
     dateInput.value = '';
@@ -33,7 +30,6 @@ async function loadAvailableDays() {
 
         let dayChecks = [];
 
-        // Obținem data curentă exactă
         const now = new Date();
         const currentHour = now.getHours();
         const currentMinute = now.getMinutes();
@@ -57,7 +53,6 @@ async function loadAvailableDays() {
                     .then(slots => {
                         let validSlots = slots;
 
-                        // Dacă verificăm ziua de azi, ascundem orele deja trecute
                         if (dateString === todayString) {
                             validSlots = slots.filter(slot => {
                                 const [slotHour, slotMinute] = slot.split(':').map(Number);
@@ -67,7 +62,6 @@ async function loadAvailableDays() {
                             });
                         }
 
-                        // Doar dacă au rămas sloturi valide în viitor, arătăm ziua
                         if (validSlots && validSlots.length > 0) {
                             return { date: d, dateString: dateString, dayNameEng: dayNameEng };
                         }
@@ -122,14 +116,11 @@ async function loadAvailableDays() {
     }
 }
 
-// ==============================================================
-// GENERATOR VIZUAL ORE
-// ==============================================================
 async function loadAvailableTimeSlots() {
     const doctorId = doctorSelect.value;
     const chosenDate = dateInput.value;
 
-    timeSelect.value = ''; // Resetăm ora
+    timeSelect.value = '';
     hoursContainer.innerHTML = '<span class="spinner-border spinner-border-sm text-primary"></span><span class="ms-2">Se caută ore libere...</span>';
 
     try {
@@ -137,7 +128,6 @@ async function loadAvailableTimeSlots() {
         if (response.ok) {
             const slots = await response.json();
 
-            // Obținem data curentă exactă
             const now = new Date();
             const currentHour = now.getHours();
             const currentMinute = now.getMinutes();
@@ -145,13 +135,12 @@ async function loadAvailableTimeSlots() {
 
             let filteredSlots = slots;
 
-            // Dacă s-a selectat ziua de AZI, filtrăm orele din trecut
             if (chosenDate === todayString) {
                 filteredSlots = slots.filter(slot => {
                     const [slotHour, slotMinute] = slot.split(':').map(Number);
                     if (slotHour > currentHour) return true;
                     if (slotHour === currentHour && slotMinute > currentMinute) return true;
-                    return false; // Ascunde ora dacă a trecut
+                    return false;
                 });
             }
 
@@ -190,9 +179,6 @@ async function loadAvailableTimeSlots() {
 
 doctorSelect.addEventListener('change', loadAvailableDays);
 
-// ==============================================================
-// LOGICA DE ÎNCĂRCARE MEDICI
-// ==============================================================
 async function loadDoctors(specialtyId, doctorIdToSelect = null) {
     doctorSelect.disabled = true;
     doctorSelect.innerHTML = '<option value="" selected disabled>Se încarcă medicii...</option>';
@@ -236,9 +222,6 @@ async function loadDoctors(specialtyId, doctorIdToSelect = null) {
     }
 }
 
-// ==============================================================
-// LOGICA DE ÎNCĂRCARE SPECIALIZĂRI
-// ==============================================================
 async function loadSpecialties() {
     try {
         const response = await fetch(`${API_BASE_URL}/specialties`);
@@ -269,9 +252,6 @@ specialtySelect.addEventListener('change', () => {
     loadDoctors(specialtySelect.value);
 });
 
-// ==============================================================
-// LOGICA DE SUBMIT
-// ==============================================================
 bookingForm.onsubmit = async (e) => {
     e.preventDefault();
 
@@ -321,9 +301,6 @@ bookingForm.onsubmit = async (e) => {
     }
 };
 
-// ==============================================================
-// INIȚIALIZARE
-// ==============================================================
 window.addEventListener('componentsLoaded', () => {
     const mainScript = document.createElement('script');
     mainScript.src = 'assets/js/main.js';

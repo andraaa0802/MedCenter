@@ -12,6 +12,5 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     List<Booking> findByDoctorId(Long doctorId);
     List<Booking> findByUserId(Long userId);
 
-    // NOU: Metodă magică ce caută programări confirmate care au depășit o anumită oră
     List<Booking> findByStatusAndEndTimeBefore(String status, LocalDateTime time);
 }

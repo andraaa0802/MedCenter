@@ -9,8 +9,6 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        // Mapăm adresa web către folderul tău fizic de pe Mac
-        // ATENȚIE: Calea trebuie să se termine cu slash (/)
         registry.addResourceHandler("/uploads/**")
                 .addResourceLocations("file:/Users/andra/Desktop/Clinica_Uploads/");
     }

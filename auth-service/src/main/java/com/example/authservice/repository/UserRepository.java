@@ -8,9 +8,7 @@ import java.util.Optional;
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
 
-    // Pentru logare (existență pacient/doctor)
     Optional<User> findByEmail(String email);
 
-    // NOU: Pentru ștergerea contului de acces când medicul este concediat
     Optional<User> findByDoctorId(Long doctorId);
 }

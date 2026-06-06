@@ -1,0 +1,476 @@
+const role = localStorage.getItem('userRole');
+    if (role === 'ADMIN' || role === 'DOCTOR') {
+        document.documentElement.classList.add('is-staff');
+    }
+
+
+    let allDoctors = [];
+    const API_BASE = '/resources/doctors';
+    const SPEC_API_BASE = '/resources/specialties';
+    const DAYS_RO = { 'MONDAY': 'Luni', 'TUESDAY': 'Marți', 'WEDNESDAY': 'Miercuri', 'THURSDAY': 'Joi', 'FRIDAY': 'Vineri' };
+
+    function generateStarsHtml(rating, reviewCount) {
+        if (!reviewCount || reviewCount === 0) {
+            return '<div class="text-muted small mb-2"><i class="bi bi-star"></i> Medic nou (fără rating)</div>';
+        }
+        let starsHtml = '<div class="text-warning mb-2" style="font-size: 0.95rem;">';
+        for (let i = 1; i <= 5; i++) {
+            if (rating >= i) {
+                starsHtml += '<i class="bi bi-star-fill me-1"></i>';
+            } else if (rating >= i - 0.5) {
+                starsHtml += '<i class="bi bi-star-half me-1"></i>';
+            } else {
+                starsHtml += '<i class="bi bi-star me-1"></i>';
+            }
+        }
+        starsHtml += `<span class="text-muted ms-2 fw-bold" style="font-size: 0.85rem;">${rating} <span class="fw-normal">(${reviewCount} voturi)</span></span>`;
+        starsHtml += '</div>';
+        return starsHtml;
+    }
+
+    async function fetchDoctors() {
+        const container = document.getElementById('doctors-display-container');
+        try {
+            const response = await fetch(`${API_BASE}/all`);
+            if (!response.ok) throw new Error("Backend unreachable");
+            allDoctors = await response.json();
+            generateFilterButtons(allDoctors);
+            renderDoctors(allDoctors);
+        } catch (error) {
+            container.innerHTML = '<div class="alert alert-danger w-100 text-center">Eroare: Nu s-a putut încărca lista de medici.</div>';
+            document.getElementById('category-filters').innerHTML = '';
+        }
+    }
+
+    function generateFilterButtons(doctors) {
+        const filterContainer = document.getElementById('category-filters');
+        const uniqueSpecialties = [...new Set(doctors.map(doc => doc.specialty.name))];
+        let buttonsHTML = `<button class="btn btn-primary m-1 filter-btn active-filter" data-category="all">Toți Medicii</button>`;
+        uniqueSpecialties.forEach(spec => {
+            buttonsHTML += `<button class="btn btn-outline-primary m-1 filter-btn" data-category="${spec}">${spec}</button>`;
+        });
+        filterContainer.innerHTML = buttonsHTML;
+    }
+
+    function renderDoctors(doctorsToDisplay) {
+        const container = document.getElementById('doctors-display-container');
+        const userRole = localStorage.getItem('userRole');
+        const myDoctorId = localStorage.getItem('doctorId');
+        container.innerHTML = '';
+
+        if (doctorsToDisplay.length === 0) {
+            container.innerHTML = '<div class="col-12 text-center py-5"><h3>Nu s-au găsit medici.</h3></div>';
+            return;
+        }
+
+        doctorsToDisplay.forEach(doc => {
+            if (doc.isActive === false && userRole !== 'ADMIN') return;
+            const imageUrl = doc.imageUrl ? doc.imageUrl : 'assets/img/doctors/doctors-1.jpg';
+            let actionButton = '';
+            const safeName = doc.name.replace(/'/g, "\\'");
+            const safePhoto = imageUrl.replace(/'/g, "\\'");
+
+            if (userRole === 'ADMIN') {
+                actionButton = `<button class="btn btn-secondary btn-sm px-3 shadow-sm fw-bold" onclick="openMasterEditModal(${doc.id}, '${safeName}', ${doc.consultationPrice}, '${safePhoto}', ${doc.isActive})"><i class="bi bi-gear-fill"></i> Gestionează</button>`;
+            } else if (userRole === 'DOCTOR') {
+                if (myDoctorId && parseInt(myDoctorId) === doc.id) {
+                    actionButton = `<button class="btn btn-warning btn-sm px-3 shadow-sm fw-bold" onclick="openMasterEditModal(${doc.id}, '${safeName}', ${doc.consultationPrice}, '${safePhoto}', true)"><i class="bi bi-person-lines-fill"></i> Editează Profilul Meu</button>`;
+                }
+            } else {
+                actionButton = `<a href="booking.html?specialtyId=${doc.specialty.id}&doctorId=${doc.id}" class="btn btn-primary btn-sm px-3 shadow-sm">Fă o programare</a>`;
+            }
+
+            const inactiveOverlay = doc.isActive === false ? '<div class="position-absolute top-0 start-0 w-100 h-100 bg-light opacity-50 z-1" style="border-radius: 5px;"></div><span class="badge bg-danger position-absolute top-0 end-0 m-3 z-2 px-3 py-2 fs-6 shadow">SUSPENDAT</span>' : '';
+            const grayscaleStyle = doc.isActive === false ? 'filter: grayscale(100%);' : '';
+
+            container.innerHTML += `
+                <div class="col-lg-6" data-aos="fade-up">
+                    <div class="team-member position-relative d-flex align-items-start p-4 shadow-sm bg-white rounded h-100" style="border: 1px solid #f0f0f0;">
+                        ${inactiveOverlay}
+                        <div class="pic z-2"><img src="${imageUrl}" class="img-fluid rounded" style="width: 120px; height: 120px; object-fit: cover; ${grayscaleStyle}"></div>
+                        <div class="member-info ps-4 w-100 z-2">
+                            <h4 class="mb-1">${doc.name}</h4>
+                            <span class="badge bg-info text-dark mb-2">${doc.specialty.name}</span>
+                            ${generateStarsHtml(doc.rating, doc.reviewCount)}
+                            <p class="text-muted small mb-2" style="min-height: 40px;">${doc.specialty.description || ''}</p>
+
+                            <div class="w-100 mb-3">
+                                <button class="btn btn-sm text-primary p-0 text-decoration-none fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#schedule-collapse-${doc.id}" onclick="loadPublicSchedule(${doc.id})">
+                                    <i class="bi bi-clock-history"></i> Vezi Orar
+                                </button>
+                                <div class="collapse mt-2" id="schedule-collapse-${doc.id}">
+                                    <div class="card card-body p-2 border-0 bg-light small" id="schedule-content-${doc.id}">
+                                        <div class="text-center"><div class="spinner-border spinner-border-sm text-primary"></div></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center mt-auto border-top pt-3">
+                                <div class="price text-success fw-bold fs-5"><i class="bi bi-cash"></i> ${doc.consultationPrice} RON</div>
+                                ${actionButton}
+                            </div>
+                        </div>
+                    </div>
+                </div>`;
+        });
+        if (typeof AOS !== 'undefined') AOS.refresh();
+    }
+
+    async function loadPublicSchedule(doctorId) {
+        const contentDiv = document.getElementById(`schedule-content-${doctorId}`);
+        if (contentDiv.getAttribute('data-loaded') === 'true') return;
+
+        try {
+            const response = await fetch(`/resources/doctors/${doctorId}/schedule`);
+            if (!response.ok) throw new Error();
+            const schedule = await response.json();
+
+            let html = '<ul class="list-unstyled mb-0" style="line-height: 1.6;">';
+            const zileRo = { 'MONDAY': 'Luni', 'TUESDAY': 'Marți', 'WEDNESDAY': 'Miercuri', 'THURSDAY': 'Joi', 'FRIDAY': 'Vineri' };
+
+            ['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY'].forEach(day => {
+                const dayConfig = schedule.find(s => s.dayOfWeek === day);
+                if (dayConfig && dayConfig.isActive) {
+                    html += `<li><strong>${zileRo[day]}:</strong> <span class="text-primary fw-bold">${dayConfig.startHour}:00 - ${dayConfig.endHour}:00</span></li>`;
+                } else {
+                    html += `<li class="text-muted"><strong>${zileRo[day]}:</strong> <span class="fst-italic">Indisponibil</span></li>`;
+                }
+            });
+            html += '</ul>';
+
+            contentDiv.innerHTML = html;
+            contentDiv.setAttribute('data-loaded', 'true');
+        } catch (e) {
+            contentDiv.innerHTML = '<span class="text-danger"><i class="bi bi-exclamation-triangle"></i> Orarul nu este setat.</span>';
+        }
+    }
+
+    document.addEventListener('click', (e) => {
+        if (e.target.classList.contains('filter-btn')) {
+            const selectedCategory = e.target.getAttribute('data-category');
+            const filteredDoctors = selectedCategory === 'all' ? allDoctors : allDoctors.filter(d => d.specialty.name === selectedCategory);
+            renderDoctors(filteredDoctors);
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('btn-primary', 'active-filter');
+                btn.classList.add('btn-outline-primary');
+            });
+            e.target.classList.remove('btn-outline-primary');
+            e.target.classList.add('btn-primary', 'active-filter');
+        }
+    });
+
+
+    function openMasterEditModal(id, name, price, imageUrl, isActive) {
+        const triggerEl = document.querySelector('#doctorManagementTabs button[data-bs-target="#tab-info"]');
+        bootstrap.Tab.getOrCreateInstance(triggerEl).show();
+
+        document.getElementById('edit-doctor-id').value = id;
+        document.getElementById('edit-doc-title-name').innerText = name;
+        document.getElementById('edit-doctor-name').value = name;
+        document.getElementById('edit-doctor-price').value = price;
+        document.getElementById('edit-doctor-photo-old').value = imageUrl;
+        document.getElementById('edit-doctor-image-file').value = '';
+
+        const statusBadge = document.getElementById('current-status-badge');
+        const toggleBtn = document.getElementById('toggle-status-btn');
+
+        if (isActive) {
+            statusBadge.innerHTML = '<span class="text-success"><i class="bi bi-check-circle-fill"></i> Activ</span>';
+            toggleBtn.className = 'btn btn-outline-danger shadow-sm fw-bold';
+            toggleBtn.innerHTML = '<i class="bi bi-pause-circle"></i> Suspendă Contul';
+            toggleBtn.onclick = () => toggleDoctorStatus(id, 'suspend');
+        } else {
+            statusBadge.innerHTML = '<span class="text-danger"><i class="bi bi-x-circle-fill"></i> Suspendat</span>';
+            toggleBtn.className = 'btn btn-primary shadow-sm fw-bold';
+            toggleBtn.innerHTML = '<i class="bi bi-play-circle"></i> Reactivează Medicul';
+            toggleBtn.onclick = () => toggleDoctorStatus(id, 'reactivate');
+        }
+
+        loadScheduleForModal(id);
+        const editModal = new bootstrap.Modal(document.getElementById('editDoctorModal'));
+        editModal.show();
+    }
+
+    async function toggleDoctorStatus(doctorId, action) {
+        const isSuspend = action === 'suspend';
+        const msg = isSuspend
+            ? "Ești sigur că vrei să SUSPENZI acest medic? Nu va mai primi programări, dispare de pe site, și i se taie accesul de logare."
+            : "Ești sigur că vrei să REACTIVEZI acest medic? Va deveni din nou vizibil și se va putea loga.";
+
+        if (!confirm(msg)) return;
+
+        const endpoint = isSuspend ? `${API_BASE}/${doctorId}` : `${API_BASE}/${doctorId}/reactivate`;
+        const method = isSuspend ? 'DELETE' : 'PUT';
+
+        try {
+            const response = await fetch(endpoint, { method: method });
+            if (response.ok) {
+                alert(`Medicul a fost ${isSuspend ? 'suspendat' : 'reactivat'} cu succes!`);
+                bootstrap.Modal.getInstance(document.getElementById('editDoctorModal')).hide();
+                fetchDoctors();
+            } else {
+                alert("Eroare la operatiune.");
+            }
+        } catch (e) { alert("Eroare de conexiune cu serverul."); }
+    }
+
+    document.getElementById('edit-doctor-form')?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const doctorId = document.getElementById('edit-doctor-id').value;
+        const btn = e.target.querySelector('button');
+        const originalText = btn.innerHTML;
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Se salvează...';
+        btn.disabled = true;
+
+        let finalImageUrl = document.getElementById('edit-doctor-photo-old').value;
+        const fileInput = document.getElementById('edit-doctor-image-file');
+
+        try {
+            if (fileInput.files.length > 0) {
+                const formData = new FormData();
+                formData.append('file', fileInput.files[0]);
+                const uploadResponse = await fetch(`${API_BASE}/upload`, { method: 'POST', body: formData });
+                if (!uploadResponse.ok) throw new Error("Eroare la upload");
+                finalImageUrl = await uploadResponse.text();
+            }
+
+            const updatedData = {
+                name: document.getElementById('edit-doctor-name').value,
+                consultationPrice: parseFloat(document.getElementById('edit-doctor-price').value),
+                imageUrl: finalImageUrl
+            };
+
+            const response = await fetch(`${API_BASE}/${doctorId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(updatedData)
+            });
+
+            if (response.ok) {
+                alert("Datele medicului au fost salvate cu succes!");
+                bootstrap.Modal.getInstance(document.getElementById('editDoctorModal')).hide();
+                fetchDoctors();
+            } else { alert("A apărut o eroare la salvare."); }
+        } catch (error) { alert("Eroare tehnică."); }
+        finally { btn.innerHTML = originalText; btn.disabled = false; }
+    });
+
+    async function loadScheduleForModal(doctorId) {
+        const matrixBody = document.getElementById('admin-schedule-matrix-body');
+        matrixBody.innerHTML = '<tr><td colspan="5" class="py-4"><div class="spinner-border text-info spinner-border-sm"></div> Se aduce orarul din baza de date...</td></tr>';
+
+        try {
+            const response = await fetch(`/resources/doctors/${doctorId}/schedule`);
+            let savedData = [];
+            if (response.ok) savedData = await response.json();
+
+            let html = '';
+            ['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY'].forEach(day => {
+                const config = savedData.find(s => s.dayOfWeek === day) || { startHour: 9, endHour: 17, slotDurationMinutes: 30, isActive: false };
+                html += `
+                    <tr data-day="${day}">
+                        <td class="fw-bold text-start ps-3">${DAYS_RO[day]}</td>
+                        <td>
+                            <div class="form-check form-switch d-inline-block">
+                                <input class="form-check-input sched-active" type="checkbox" ${config.isActive ? 'checked' : ''}>
+                            </div>
+                        </td>
+                        <td><input type="number" class="form-control form-control-sm mx-auto sched-start" value="${config.startHour}" min="0" max="23" style="max-width: 70px;"></td>
+                        <td><input type="number" class="form-control form-control-sm mx-auto sched-end" value="${config.endHour}" min="0" max="23" style="max-width: 70px;"></td>
+                        <td>
+                            <select class="form-select form-select-sm mx-auto sched-duration" style="max-width: 100px;">
+                                <option value="15" ${config.slotDurationMinutes === 15 ? 'selected' : ''}>15 min</option>
+                                <option value="30" ${config.slotDurationMinutes === 30 ? 'selected' : ''}>30 min</option>
+                                <option value="45" ${config.slotDurationMinutes === 45 ? 'selected' : ''}>45 min</option>
+                                <option value="60" ${config.slotDurationMinutes === 60 ? 'selected' : ''}>60 min</option>
+                            </select>
+                        </td>
+                    </tr>`;
+            });
+            matrixBody.innerHTML = html;
+        } catch (e) {
+            matrixBody.innerHTML = '<tr><td colspan="5" class="text-danger py-4">Eroare la încărcarea orarului.</td></tr>';
+        }
+    }
+
+    document.getElementById('admin-weekly-schedule-form')?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const doctorId = document.getElementById('edit-doctor-id').value;
+        const btn = e.target.querySelector('button');
+        const orig = btn.innerHTML;
+        btn.disabled = true; btn.innerHTML = 'Se salvează...';
+
+        const payload = [];
+        document.querySelectorAll('#admin-schedule-matrix-body tr').forEach(row => {
+            payload.push({
+                dayOfWeek: row.getAttribute('data-day'),
+                isActive: row.querySelector('.sched-active').checked,
+                startHour: parseInt(row.querySelector('.sched-start').value),
+                endHour: parseInt(row.querySelector('.sched-end').value),
+                slotDurationMinutes: parseInt(row.querySelector('.sched-duration').value)
+            });
+        });
+
+        try {
+            const res = await fetch(`/resources/doctors/${doctorId}/schedule/save`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            if (res.ok) alert("Orarul a fost salvat cu succes!");
+            else alert("Eroare la salvare.");
+        } catch(e) { alert("Eroare conexiune."); }
+        finally { btn.disabled = false; btn.innerHTML = orig; }
+    });
+
+    document.getElementById('admin-vacation-form')?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const doctorId = document.getElementById('edit-doctor-id').value;
+        const startDate = document.getElementById('admin-vacation-start').value;
+        const endDate = document.getElementById('admin-vacation-end').value;
+
+        if (new Date(endDate) < new Date(startDate)) return alert("Data finală trebuie să fie după cea inițială!");
+
+        const btn = e.target.querySelector('button');
+        const orig = btn.innerHTML;
+        btn.disabled = true; btn.innerHTML = '...';
+
+        try {
+            const response = await fetch(`/bookings/doctor/${doctorId}/block-period`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ startDate, endDate })
+            });
+
+            if (response.ok) {
+                alert("Perioada a fost blocată cu succes!");
+                e.target.reset();
+            } else {
+                alert("Eroare la blocare: " + await response.text());
+            }
+        } catch (error) { alert("Eroare conexiune bookings service."); }
+        finally { btn.disabled = false; btn.innerHTML = orig; }
+    });
+
+
+
+    async function loadSpecialtiesAdmin() {
+        const select = document.getElementById('doc-specialty');
+        try {
+            const res = await fetch(`${SPEC_API_BASE}/all`);
+            const specialties = await res.json();
+            select.innerHTML = '<option value="">Alege specializarea...</option>';
+            specialties.forEach(spec => {
+                select.innerHTML += `<option value="${spec.id}">${spec.name}</option>`;
+            });
+            select.innerHTML += `<option value="NEW" class="text-primary fw-bold">+ Adaugă Specializare Nouă...</option>`;
+        } catch(e) {}
+    }
+
+    document.getElementById('doc-specialty')?.addEventListener('change', (e) => {
+        const div = document.getElementById('new-specialty-section');
+        if (e.target.value === 'NEW') {
+            div.style.display = 'block';
+            document.getElementById('doc-specialty').removeAttribute('required');
+        } else {
+            div.style.display = 'none';
+            document.getElementById('doc-specialty').setAttribute('required', 'true');
+        }
+    });
+
+    document.getElementById('btn-save-spec')?.addEventListener('click', async () => {
+        const name = document.getElementById('new-spec-name').value;
+        const desc = document.getElementById('new-spec-desc').value;
+        if (!name) return alert('Introdu numele specializării!');
+        try {
+            const res = await fetch(`${SPEC_API_BASE}/add`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name: name, description: desc })
+            });
+            if (res.ok) {
+                document.getElementById('new-spec-name').value = '';
+                document.getElementById('new-spec-desc').value = '';
+                document.getElementById('new-specialty-section').style.display = 'none';
+                await loadSpecialtiesAdmin();
+            }
+        } catch (error) { alert('Eroare tehnică.'); }
+    });
+
+    document.getElementById('add-doctor-form')?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const fileInput = document.getElementById('doc-image-file');
+        const submitBtn = e.target.querySelector('button[type="submit"]');
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Se creează profilul și contul...';
+
+        try {
+            const formData = new FormData();
+            formData.append('file', fileInput.files[0]);
+            const uploadResponse = await fetch(`${API_BASE}/upload`, { method: 'POST', body: formData });
+            if (!uploadResponse.ok) throw new Error("Eroare la upload imagine");
+            const uploadedImageUrl = await uploadResponse.text();
+
+            const doctorData = {
+                name: document.getElementById('doc-name').value,
+                specialtyId: parseInt(document.getElementById('doc-specialty').value),
+                consultationPrice: parseFloat(document.getElementById('doc-price').value),
+                imageName: uploadedImageUrl
+            };
+
+            const saveResponse = await fetch(`${API_BASE}/add`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(doctorData)
+            });
+
+            if (saveResponse.ok) {
+                const createdDoctor = await saveResponse.json();
+
+                const authResponse = await fetch('/auth/create-doctor-account', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        name: document.getElementById('doc-name').value,
+                        email: document.getElementById('doc-email').value,
+                        phone: document.getElementById('doc-phone').value,
+                        doctorId: createdDoctor.id.toString()
+                    })
+                });
+
+                if(authResponse.ok) {
+                    alert("Medicul și contul său de acces au fost create cu succes!");
+                } else {
+                    const errText = await authResponse.text();
+                    alert("Profilul public a fost creat, însă contul de acces a dat o eroare: " + errText);
+                }
+
+                document.getElementById('add-doctor-form').reset();
+                bootstrap.Modal.getInstance(document.getElementById('addDoctorModal')).hide();
+                fetchDoctors();
+            } else {
+                alert('Eroare la adăugarea profilului de medic în sistem.');
+            }
+        } catch (error) {
+            alert('Eroare: ' + error.message);
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<i class="bi bi-save me-1"></i> Înregistrează Medicul';
+        }
+    });
+
+    window.addEventListener('componentsLoaded', () => {
+        fetchDoctors();
+        const mainScript = document.createElement('script');
+        mainScript.src = 'assets/js/main.js';
+        mainScript.onload = () => { if (typeof AOS !== 'undefined') AOS.init({ duration: 600, once: true }); };
+        document.body.appendChild(mainScript);
+    });
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const userRole = localStorage.getItem('userRole');
+        if (userRole === 'ADMIN') {
+            const adminBtnContainer = document.getElementById('admin-action-container');
+            if (adminBtnContainer) adminBtnContainer.style.display = 'block';
+            loadSpecialtiesAdmin();
+        }
+    });

@@ -72,7 +72,6 @@ function checkUserStatus() {
     }
 }
 
-// Inițializare și Evenimente Formulare
 window.addEventListener('componentsLoaded', () => {
     checkUserStatus();
 

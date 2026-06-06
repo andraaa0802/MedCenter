@@ -6,8 +6,6 @@ window.addEventListener('componentsLoaded', () => {
     }
 
 
-    // ----------------------------------
-
     const mainScript = document.createElement('script');
     mainScript.src = 'assets/js/main.js';
     mainScript.onload = () => {
@@ -24,7 +22,6 @@ window.addEventListener('componentsLoaded', () => {
     document.body.appendChild(mainScript);
 });
 
-// --- LOGICA PENTRU FORMULARUL DE CONTACT ---
 document.addEventListener('DOMContentLoaded', () => {
     const form = document.getElementById('contact-form');
     if (!form) return;

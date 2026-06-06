@@ -1,9 +1,14 @@
 package com.example.bookingservice.model;
 
 import jakarta.persistence.*;
+import lombok.*;
 
 @Entity
 @Table(name = "specialties", catalog="resource_db")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class Specialty {
 
     @Id
@@ -15,16 +20,4 @@ public class Specialty {
 
     @Column
     private String description;
-
-    public Specialty() {}
-
-    // Getters și Setters
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
-
-    public String getName() { return name; }
-    public void setName(String name) { this.name = name; }
-
-    public String getDescription() { return description; }
-    public void setDescription(String description) { this.description = description; }
 }

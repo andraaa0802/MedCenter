@@ -137,7 +137,6 @@ function renderAdminCharts(specDist, statusDist) {
     });
 }
 
-// Funcție universală de anulare a programărilor (folosită de Pacient, Doctor și Admin)
 async function cancelBooking(bookingId, callerRole) {
     if (confirm("Ești sigur că vrei să anulezi această programare/pauză?")) {
         try {
@@ -184,7 +183,11 @@ async function loadAdminMessages() {
                         <td><strong>${msg.name}</strong></td>
                         <td><a href="mailto:${msg.email}" class="text-decoration-none ${isMessageRead ? 'text-muted' : ''}">${msg.email}</a></td>
                         <td><span class="badge bg-secondary">${msg.subject}</span></td>
-                        <td style="max-width: 250px; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;" title="${msg.message}">${msg.message}</td>
+                        <td style="max-width: 250px; cursor: pointer; color: #0d6efd;"
+                            onclick="showFullMessage('${msg.message.replace(/'/g, "\\'")}')"
+                            title="Click pentru a vedea tot mesajul">
+                            ${msg.message.substring(0, 30)}${msg.message.length > 30 ? '...' : ''}
+                        </td>
                         <td>${statusBadge}</td>
                         <td>${actionButton}</td>
                     </tr>
@@ -200,4 +203,13 @@ async function markMessageAsRead(messageId) {
         const response = await fetch(`/resources/contact/${messageId}/read`, { method: 'PUT' });
         if (response.ok) loadAdminMessages();
     } catch (error) {}
+}
+
+function showFullMessage(text) {
+    const modalBody = document.getElementById('modalMessageBody');
+    if (modalBody) {
+        modalBody.innerText = text;
+        var myModal = new bootstrap.Modal(document.getElementById('messageModal'));
+        myModal.show();
+    }
 }

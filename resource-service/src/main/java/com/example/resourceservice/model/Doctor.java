@@ -27,7 +27,6 @@ public class Doctor {
 
     private String imageUrl;
 
-    // --- CÂMPURI PENTRU PROGRAMUL DE LUCRU ---
     @Column(name = "start_hour", columnDefinition = "integer default 9")
     private Integer startHour = 9;
 
@@ -40,7 +39,6 @@ public class Doctor {
     @Column(columnDefinition = "boolean default true")
     private Boolean isActive = true;
 
-    // --- CÂMPURI NOI PENTRU RECENZII ---
     @Column(name = "rating", columnDefinition = "Double default 0.0")
     private Double rating = 0.0;
 

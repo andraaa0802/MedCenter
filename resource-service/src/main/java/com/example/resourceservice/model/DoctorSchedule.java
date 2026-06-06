@@ -19,7 +19,7 @@ public class DoctorSchedule {
     private Long doctorId;
 
     @Column(name = "day_of_week", nullable = false)
-    private String dayOfWeek; // MONDAY, TUESDAY etc.
+    private String dayOfWeek;
 
     @Column(name = "start_hour", nullable = false)
     private Integer startHour;

@@ -74,7 +74,7 @@
   }
 
   /**
-   * Scroll top button (SECȚIUNEA REPARATĂ)
+   * Scroll top button
    */
   let scrollTop = document.querySelector('.scroll-top');
 
@@ -196,14 +196,12 @@
   window.addEventListener('load', navmenuScrollspy);
   document.addEventListener('scroll', navmenuScrollspy);
 
-  // === LOGICĂ PENTRU ACTUALIZAREA BAREI DE NAVIGARE (HEADER) ===
   function updateNavbar() {
       const loginItem = document.getElementById('nav-login-item');
       const userItem = document.getElementById('nav-user-item');
       const userNameDisplay = document.getElementById('display-user-name');
       const logoutBtn = document.getElementById('btn-logout');
 
-      // Am preluat butonul exact pe care l-am etichetat în header.html
       const headerAppointmentBtn = document.getElementById('header-appointment-btn');
 
       const isLoggedIn = localStorage.getItem('isLoggedIn');
@@ -219,7 +217,6 @@
                   userNameDisplay.textContent = userName.split(' ')[0];
               }
 
-              // Dacă e ADMIN, ascundem elegant butonul. Altfel, îl lăsăm vizibil.
               if (headerAppointmentBtn) {
                   if (userRole === 'ADMIN') {
                       headerAppointmentBtn.style.setProperty('display', 'none', 'important');
@@ -251,7 +248,6 @@
   window.addEventListener('componentsLoaded', updateNavbar);
   setTimeout(updateNavbar, 300);
 
-  // === LOGICĂ GLOBALĂ PENTRU BUTOANELE DE PROGRAMARE ===
   document.addEventListener('click', (e) => {
       const appointmentBtn = e.target.closest('a[href="#appointment"], .btn-appointment');
 

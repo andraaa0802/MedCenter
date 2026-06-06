@@ -2,20 +2,17 @@ package com.example.authservice.controller;
 
 import com.example.authservice.model.MedicalProfile;
 import com.example.authservice.repository.MedicalProfileRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Optional;
-
 @RestController
 @RequestMapping("/auth/profile")
+@RequiredArgsConstructor
 public class MedicalProfileController {
 
-    @Autowired
-    private MedicalProfileRepository profileRepository;
+    private final MedicalProfileRepository profileRepository;
 
-    // Citim fișa medicală a unui pacient
     @GetMapping("/{userId}")
     public ResponseEntity<MedicalProfile> getProfile(@PathVariable Long userId) {
         return profileRepository.findByUserId(userId)
@@ -23,27 +20,18 @@ public class MedicalProfileController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    // Creăm sau actualizăm fișa medicală
     @PostMapping("/{userId}")
     public ResponseEntity<MedicalProfile> saveProfile(@PathVariable Long userId, @RequestBody MedicalProfile profileData) {
-        Optional<MedicalProfile> existingProfile = profileRepository.findByUserId(userId);
-        MedicalProfile profileToSave;
+        MedicalProfile profileToSave = profileRepository.findByUserId(userId)
+                .orElse(new MedicalProfile());
 
-        if (existingProfile.isPresent()) {
-            // Dacă există deja, îl actualizăm (Update)
-            profileToSave = existingProfile.get();
-            profileToSave.setBloodType(profileData.getBloodType());
-            profileToSave.setWeight(profileData.getWeight());
-            profileToSave.setHeight(profileData.getHeight());
-            profileToSave.setAllergies(profileData.getAllergies());
-            profileToSave.setChronicConditions(profileData.getChronicConditions());
-        } else {
-            // Dacă nu există, creăm unul nou (Create)
-            profileToSave = profileData;
-            profileToSave.setUserId(userId);
-        }
+        profileToSave.setUserId(userId);
+        profileToSave.setBloodType(profileData.getBloodType());
+        profileToSave.setWeight(profileData.getWeight());
+        profileToSave.setHeight(profileData.getHeight());
+        profileToSave.setAllergies(profileData.getAllergies());
+        profileToSave.setChronicConditions(profileData.getChronicConditions());
 
-        MedicalProfile savedProfile = profileRepository.save(profileToSave);
-        return ResponseEntity.ok(savedProfile);
+        return ResponseEntity.ok(profileRepository.save(profileToSave));
     }
 }

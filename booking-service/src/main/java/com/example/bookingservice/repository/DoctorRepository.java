@@ -7,6 +7,5 @@ import java.util.List;
 
 @Repository
 public interface DoctorRepository extends JpaRepository<Doctor, Long> {
-    // Spring Boot știe să caute după ID-ul specializării din interiorul obiectului Specialty
     List<Doctor> findBySpecialtyId(Long specialtyId);
 }
